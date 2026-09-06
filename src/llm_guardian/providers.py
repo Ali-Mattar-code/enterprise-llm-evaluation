@@ -116,3 +116,30 @@ class AnthropicProvider:
             input_tokens=int(result.usage.input_tokens),
             output_tokens=int(result.usage.output_tokens),
         )
+
+
+@dataclass
+class GeminiProvider:
+    model: str = "gemini-2.5-flash"
+    name: str = "gemini"
+
+    def generate(self, case: EvalCase) -> ModelResponse:
+        try:
+            from google import genai  # type: ignore[import-not-found]
+        except ImportError as exc:
+            raise RuntimeError("Install llm-guardian[gemini] for this adapter.") from exc
+        client = genai.Client()
+        evidence = "\n".join(f"[{index}] {item}" for index, item in enumerate(case.context, 1))
+        prompt = f"Evidence:\n{evidence}\n\nRequest:\n{case.prompt}" if evidence else case.prompt
+        started = perf_counter()
+        result = client.models.generate_content(model=self.model, contents=prompt)
+        latency_ms = (perf_counter() - started) * 1000
+        usage = getattr(result, "usage_metadata", None)
+        return ModelResponse(
+            text=str(result.text or ""),
+            provider=self.name,
+            model=self.model,
+            latency_ms=latency_ms,
+            input_tokens=int(getattr(usage, "prompt_token_count", 0) or 0),
+            output_tokens=int(getattr(usage, "candidates_token_count", 0) or 0),
+        )

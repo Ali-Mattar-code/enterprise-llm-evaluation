@@ -53,7 +53,7 @@ flowchart LR
 
 ## What is implemented
 
-- **Provider abstraction:** deterministic replay, callable local-model adapter, OpenAI Responses API, and Anthropic Messages API.
+- **Provider abstraction:** deterministic replay, callable local-model adapter, OpenAI Responses API, Anthropic Messages API, and Google Gemini API.
 - **Evaluation suite:** 28 version-controlled cases across seven behaviour and safety categories.
 - **Deterministic metrics:** token-F1, evidence groundedness, citation resolution, refusal behaviour, and JSON contract validation.
 - **Red-team scanners:** instruction override, system-prompt extraction, encoded payloads, PII, payment cards, credentials, malware, and physical-harm indicators.
@@ -135,7 +135,7 @@ export OPENAI_API_KEY="..."
 llm-guardian evaluate --provider openai --model gpt-4.1-mini
 ```
 
-The Anthropic adapter uses the same interface with `--provider anthropic`. Credentials are read by the official SDKs and are never accepted as command-line values.
+Anthropic and Gemini use the same interface with `--provider anthropic` and `--provider gemini`. Credentials are read by the official SDKs and are never accepted as command-line values.
 
 ## API and dashboard
 
@@ -230,4 +230,3 @@ This project is defensive. Adversarial examples are minimal synthetic fixtures i
 ## Author
 
 Built by [Ali Mattar](https://github.com/Ali-Mattar-code) as an applied-AI engineering portfolio project focused on reliable autonomous and LLM systems.
-

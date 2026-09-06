@@ -10,7 +10,13 @@ from rich.table import Table
 
 from .engine import EvaluationEngine, load_cases
 from .gates import ReleaseGate
-from .providers import AnthropicProvider, OpenAIProvider, Provider, ReplayProvider
+from .providers import (
+    AnthropicProvider,
+    GeminiProvider,
+    OpenAIProvider,
+    Provider,
+    ReplayProvider,
+)
 from .reporting import write_json
 from .scanners import redact_sensitive, scan_text
 
@@ -24,7 +30,7 @@ def evaluate(
         Path, typer.Option(exists=True)
     ] = Path("datasets/evaluation_suite.jsonl"),
     provider: Annotated[
-        str, typer.Option(help="replay, openai, or anthropic")
+        str, typer.Option(help="replay, openai, anthropic, or gemini")
     ] = "replay",
     model: Annotated[str, typer.Option()] = "guarded-v2",
     response_key: Annotated[str, typer.Option()] = "candidate_response",
@@ -38,8 +44,10 @@ def evaluate(
         adapter = OpenAIProvider(model=model)
     elif provider == "anthropic":
         adapter = AnthropicProvider(model=model)
+    elif provider == "gemini":
+        adapter = GeminiProvider(model=model)
     else:
-        raise typer.BadParameter("provider must be replay, openai, or anthropic")
+        raise typer.BadParameter("provider must be replay, openai, anthropic, or gemini")
     summary = EvaluationEngine().evaluate(load_cases(dataset), adapter)
     write_json(output, summary.to_dict())
     console.print(f"[bold]Pass rate:[/] {summary.pass_rate:.1%}")
