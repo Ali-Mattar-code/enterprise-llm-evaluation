@@ -12,7 +12,7 @@
 
 | Threat | Example impact | Implemented control | Residual risk |
 |---|---|---|---|
-| Direct prompt injection | Policy bypass or prompt disclosure | Injection rules, refusal tests, category gate | Novel wording and multilingual attacks |
+| Direct prompt injection | Policy bypass or prompt disclosure | Unicode-canonicalized injection rules, refusal tests, category gate | Homoglyph, novel wording and multilingual attacks |
 | Indirect injection | Malicious text inside retrieved evidence | Versioned adversarial cases; provider boundary | Requires context-aware isolation in the host application |
 | PII exfiltration | Private contact or payment data in output | Output scanning, redaction helper, zero-failure privacy gate | Pattern rules miss unusual formats |
 | Secret leakage | API or cloud keys returned to a user | Credential rules and zero-failure secret gate | Unknown credential formats |
@@ -28,4 +28,3 @@ This repository is not a web-application firewall, compliance certification, con
 ## Reporting
 
 Do not open public issues containing working credentials, private prompts, customer data, or exploitable production details. Revoke exposed credentials first, then use the repository owner's private contact channel.
-

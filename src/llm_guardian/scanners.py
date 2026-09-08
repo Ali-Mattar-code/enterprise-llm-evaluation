@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass
 
 from .models import Finding, Severity
@@ -96,13 +97,27 @@ HARM_RULES = (
 )
 
 
+def _canonicalize_for_scanning(text: str) -> str:
+    """Reduce common Unicode obfuscation before applying deterministic rules.
+
+    NFKC folds compatibility forms such as full-width Latin characters. Unicode
+    format controls are removed so zero-width characters cannot split a keyword,
+    email address, or credential marker. This is a defensive preprocessing layer,
+    not a complete homoglyph or multilingual attack detector.
+    """
+
+    normalized = unicodedata.normalize("NFKC", text)
+    return "".join(char for char in normalized if unicodedata.category(char) != "Cf")
+
+
 def scan_text(text: str, *, location: str, include_input_rules: bool = True) -> tuple[Finding, ...]:
     rules: tuple[Rule, ...] = PII_RULES + SECRET_RULES
     if include_input_rules:
         rules += INJECTION_RULES + HARM_RULES
+    canonical = _canonicalize_for_scanning(text)
     findings: list[Finding] = []
     for rule in rules:
-        if rule.pattern.search(text):
+        if rule.pattern.search(canonical):
             findings.append(
                 Finding(
                     rule=rule.name,
@@ -115,7 +130,9 @@ def scan_text(text: str, *, location: str, include_input_rules: bool = True) -> 
 
 
 def redact_sensitive(text: str) -> str:
-    redacted = text
+    """Canonicalize text and replace detected PII or credential-like values."""
+
+    redacted = _canonicalize_for_scanning(text)
     for rule in PII_RULES + SECRET_RULES:
         redacted = rule.pattern.sub(f"[REDACTED:{rule.name}]", redacted)
     return redacted

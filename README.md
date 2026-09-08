@@ -56,7 +56,7 @@ flowchart LR
 - **Provider abstraction:** deterministic replay, callable local-model adapter, OpenAI Responses API, Anthropic Messages API, and Google Gemini API.
 - **Evaluation suite:** 28 version-controlled cases across seven behaviour and safety categories.
 - **Deterministic metrics:** token-F1, evidence groundedness, citation resolution, refusal behaviour, and JSON contract validation.
-- **Red-team scanners:** instruction override, system-prompt extraction, encoded payloads, PII, payment cards, credentials, malware, and physical-harm indicators.
+- **Red-team scanners:** Unicode-canonicalized checks for instruction override, system-prompt extraction, encoded payloads, PII, payment cards, credentials, malware, and physical-harm indicators.
 - **Risk-aware gating:** overall pass rate, zero-critical-failure policy, category minimums, latency, cost, mean risk, and a 95% Wilson lower confidence bound.
 - **Regression evidence:** baseline-versus-candidate comparison with category distribution drift.
 - **Human oversight:** idempotent SQLite review queue with explicit approve/reject decisions.
@@ -75,6 +75,7 @@ flowchart LR
 | Failed or ambiguous cases disappear into logs | High-risk and failed cases can enter an idempotent human-review queue. |
 | Prompt and policy changes are hard to audit | Prompt templates and policy configurations receive stable SHA-256 fingerprints. |
 | Security filters can overclaim protection | Rules are treated as a defence layer, not a complete security boundary; limitations are documented. |
+| Zero-width and compatibility characters can hide rule keywords | NFKC normalization and format-control removal run before scanning; homoglyph and multilingual attacks remain explicit residual risks. |
 
 ## Mathematical release discipline
 
